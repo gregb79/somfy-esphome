@@ -68,7 +68,7 @@ CONFIG_SCHEMA = cv.Schema(
         cv.GenerateID(CONF_RECEIVER_ID): cv.use_id(
             remote_receiver.RemoteReceiverComponent
         ),
-        cv.Required(CONF_ADDRESS): cv.hex_uint32_t,
+        cv.Required(CONF_ADDRESS, default=0xF9CB): cv.hex_uint32_t,
     }
 )
 
@@ -88,18 +88,21 @@ async def to_code(config):
     cv.Schema(
         {
             cv.Required(CONF_ID): cv.use_id(SomfyComponent),
-            cv.Required(CONF_COMMAND): cv.templatable(cv.enum(SOMFY_COMMAND, upper=True)),
-            cv.Required(CONF_MODE): cv.templatable(cv.enum(SOMFY_MODE, upper=True)),
-            cv.Optional(CONF_REPEAT): cv.templatable(cv.int_range(min=0, max=5)),
+            cv.optional(CONF_COMMAND, default="POWER"): cv.templatable(cv.enum(SOMFY_COMMAND, upper=True)),
+            cv.optional(CONF_MODE, default="POOLSPA"): cv.templatable(cv.enum(SOMFY_MODE, upper=True)),
+            cv.Optional(CONF_REPEAT): cv.templatable(cv.int_range(min=0, max=6)),
         }
     ),
 )
 async def somfy_send_command_to_code(config, action_id, template_arg, args):
     paren = await cg.get_variable(config[CONF_ID])
     var = cg.new_Pvariable(action_id, template_arg, paren)
-    command = await cg.templatable(config[CONF_COMMAND], args, SomfyCommand)
-    mode = await cg.templatable(config[CONF_MODE], args, SomfyMode)
-    repeat = await cg.templatable(config[CONF_REPEAT], args, cg.uint32)
+    // command = await cg.templatable(config[CONF_COMMAND], args, SomfyCommand)
+    command = await cg.templatable(config.get(CONF_COMMAND, "POWER"), args, SomfyCommand)
+    // mode = await cg.templatable(config[CONF_MODE], args, SomfyMode)
+    mode = await cg.templatable(config.get(CONF_MODE, "POOLSPA"), args, SomfyMode)
+    // repeat = await cg.templatable(config[CONF_REPEAT], args, cg.uint32)
+    repeat = await cg.templatable(config.get(CONF_REPEAT, 0), args, cg.uint32)
     cg.add(var.set_command(command))
     cg.add(var.set_mode(mode))
     cg.add(var.set_repeat(repeat))
