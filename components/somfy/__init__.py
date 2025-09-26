@@ -21,7 +21,7 @@ SomfySetCodeAction = somfy_ns.class_("SomfySetCodeAction", automation.Action)
 
 SomfyCommand = somfy_ns.enum("SomfyCommand")
 SOMFY_COMMAND = {
-    "MY": SomfyCommand.SOMFY_MY,
+    "POWER": SomfyCommand.SOMFY_POWER,
     "UP": SomfyCommand.SOMFY_UP,
     "MYUP": SomfyCommand.SOMFY_MYUP,
     "DOWN": SomfyCommand.SOMFY_DOWN,
