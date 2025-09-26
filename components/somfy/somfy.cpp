@@ -43,6 +43,14 @@ void SomfyComponent::send_command(SomfyCommand command, SomfyMode mode, uint32_t
   frame[6] = mode;     // Mode
   frame[7] = 0x27;     // checksum calculated from bits 0 - 6 , CheckSum8 2s Complement 0x100 - Sum Of Bytes (LAST 9 BITS)
 
+  // Calculate 8-bit 2's complement checksum from bytes 0–6
+  uint16_t sum = 0;
+  for (int i = 0; i <= 6; i++) {
+    sum += frame[i];
+  }
+  frame[7] = static_cast<uint8_t>(0x100 - (sum & 0xFF));
+
+
   // frame[0] = 0xA7;                   // encryption key. Doesn't matter much
   // frame[1] = command << 4;           // which button did  you press? The 4 LSB will be the checksum
   // frame[2] = this->code_ >> 8;       // rolling code (big endian)
