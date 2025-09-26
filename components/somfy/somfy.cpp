@@ -37,80 +37,53 @@ void SomfyComponent::send_command(SomfyCommand command, uint32_t repeat) {
   frame[4] = 0x00;     // Blank Space
   frame[5] = 0x11;     // Instruction
   frame[6] = 0x03;     // Mode
-  frame[7] = 0x27;     // checksum calculated from bits 0 - 6 , CheckSum8 2s Complement 0x100 - Sum Of Bytes ( LAST 9 BITS)
-    
+  frame[7] = 0x27;     // checksum calculated from bits 0 - 6 , CheckSum8 2s Complement 0x100 - Sum Of Bytes (LAST 9 BITS)
 
   ESP_LOGD(TAG, "Somfy sending 0x%" PRIX8 " repeated %" PRIu32 " times", command, repeat);
 
-  // // crc
-  //uint8_t crc = 0;
-  //for (uint8_t i = 0; i < 7; i++) {
-  //  crc ^= frame[i];
-  //  crc ^= frame[i] >> 4;
-  //}
-  // frame[1] |= crc & 0xF;
+  // Optional: original Somfy protocol — disabled for test mode
+  /*
+  // crc
+  uint8_t crc = 0;
+  for (uint8_t i = 0; i < 7; i++) {
+    crc ^= frame[i];
+    crc ^= frame[i] >> 4;
+  }
+  frame[1] |= crc & 0xF;
 
-  // // obfuscation
-  //for (uint8_t i = 1; i < 7; i++) {
-  //  frame[i] ^= frame[i - 1];
-  //}
+  // obfuscation
+  for (uint8_t i = 1; i < 7; i++) {
+    frame[i] ^= frame[i - 1];
+  }
 
   // update code
-  //this->code_ += 1;
-  //this->preferences_.save(&this->code_);
+  this->code_ += 1;
+  this->preferences_.save(&this->code_);
+  */
 
-  // send frame
+  // Prepare transmit
   auto call = this->tx_->transmit();
   remote_base::RemoteTransmitData *dst = call.get_data();
-  //dst->item(9415, 9565);
-  //dst->space(80000);
 
-
- repeat = 5
-  
   for (uint32_t i = 0; i < (repeat + 1); i++) {
-    // hardware sync, two sync for the first frame, seven for the following ones
-    
-    //uint32_t syncs = (i == 0) ? 2 : 7;
-    //for (uint32_t j = 0; j < syncs; j++) {
-    //  dst->item(SYMBOL * 4, SYMBOL * 4);
-    //}
-
+    // Hardware sync: send 4 bytes of 0xAA (10101010)
     const uint8_t sync_bytes[] = {0xAA, 0xAA, 0xAA, 0xAA};
-
-    for (uint32_t i = 0; i < (repeat + 1); i++) {
-      // Hardware sync: send 4 bytes of 0xAA each (8 bits)
-      for (uint8_t sync_byte : sync_bytes) {
-        uint8_t byte = sync_byte;
-        for (int bit = 0; bit < 8; bit++) {
-          if (byte & 0x80) {
-            dst->mark(105);  // bit = 1 → mark 105 µs
-          } else {
-            dst->space(104); // bit = 0 → space 104 µs
-          }
-          byte <<= 1;
+    for (uint8_t sync_byte : sync_bytes) {
+      uint8_t byte = sync_byte;
+      for (int bit = 0; bit < 8; bit++) {
+        if (byte & 0x80) {
+          dst->mark(105);   // 1 → HIGH 105 µs
+        } else {
+          dst->space(104);  // 0 → LOW 104 µs
         }
+        byte <<= 1;
       }
     }
 
-   // // software sync
-    // dst->item(4550, SYMBOL);
+    // Optional: software sync — remove if not used
+    // dst->item(4550, SYMBOL);     // mark then short space
 
-    // // data
-    //for (uint8_t byte : frame) {
-     // for (uint32_t j = 0; j < 8; j++) {
-     //   if ((byte & 0x80) != 0) {
-     //     dst->space(SYMBOL);
-     //     dst->mark(SYMBOL);
-     //   } else {
-      //    dst->mark(SYMBOL);
-     //     dst->space(SYMBOL);
-     //   }
-    //    byte <<= 1;
-    //  }
-    //}
-
-    // Send bits: 1 = mark(105), 0 = space(104)
+    // Send frame bits: 1 = mark(105), 0 = space(104)
     for (uint8_t byte : frame) {
       for (uint8_t j = 0; j < 8; j++) {
         if ((byte & 0x80) != 0) {
@@ -121,13 +94,12 @@ void SomfyComponent::send_command(SomfyCommand command, uint32_t repeat) {
         byte <<= 1;
       }
     }
-   
-    // // inter frame silence
-    //dst->space(415);
-    //if (i < repeat) {
-    //  dst->space(30000);
-    //}
+
+    // Optional: inter-frame silence
+    dst->space(10000);  // 10 ms gap before next repeat
   }
+
+  // Send the pulse train
   call.perform();
 }
 
@@ -164,21 +136,26 @@ bool SomfyComponent::on_receive(remote_base::RemoteReceiveData data) {
     }
   }
 
+  // de-obfuscate
   for (uint8_t i = 6; i >= 1; i--) {
     frame[i] ^= frame[i - 1];
   }
 
+  // verify crc
   uint8_t crc = 0;
   for (uint8_t i = 0; i < 7; i++) {
     crc ^= frame[i];
     crc ^= frame[i] >> 4;
   }
+
   if ((crc & 0xF) == 0) {
     uint8_t command = frame[1] >> 4;
     uint16_t code = (frame[2] << 8) | frame[3];
     uint32_t address = (frame[4] << 16) | (frame[5] << 8) | frame[6];
+
     ESP_LOGD(TAG, "Received: command: %" PRIx8 ", code: %" PRIu16 ", address %" PRIx32,
              command, code, address);
+
     if (command == SOMFY_SENSOR) {
       for (auto *sensor : this->sensors_) {
         sensor->update_windy(address, (code & 1) != 0);
