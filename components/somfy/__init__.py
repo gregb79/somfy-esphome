@@ -88,8 +88,8 @@ async def to_code(config):
     cv.Schema(
         {
             cv.Required(CONF_ID): cv.use_id(SomfyComponent),
-            cv.Optional(CONF_COMMAND): cv.templatable(cv.enum(SOMFY_COMMAND, upper=True)),
-            cv.Optional(CONF_MODE): cv.templatable(cv.enum(SOMFY_MODE, upper=True)),
+            cv.Optional(CONF_COMMAND, default="POWER"): cv.templatable(cv.enum(SOMFY_COMMAND, upper=True)),
+            cv.Optional(CONF_MODE, default="POOLSPA"): cv.templatable(cv.enum(SOMFY_MODE, upper=True)),
             cv.Optional(CONF_REPEAT): cv.templatable(cv.int_range(min=0, max=6)),
         }
     ),
