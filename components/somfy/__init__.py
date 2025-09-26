@@ -58,7 +58,6 @@ SOMFY_MODE = {
     "POOLSPA": SomfyMode.SOMFY_POOLSPA,
 }
 
-
 CONFIG_SCHEMA = cv.Schema(
     {
         cv.GenerateID(): cv.declare_id(SomfyComponent),
@@ -81,7 +80,6 @@ async def to_code(config):
     cg.add(var.set_rx(receiver))
     cg.add(var.set_address(config[CONF_ADDRESS]))
 
-
 @automation.register_action(
     "somfy.send_command",
     SomfySendCommandAction,
@@ -97,9 +95,9 @@ async def to_code(config):
 async def somfy_send_command_to_code(config, action_id, template_arg, args):
     paren = await cg.get_variable(config[CONF_ID])
     var = cg.new_Pvariable(action_id, template_arg, paren)
-    command = await cg.templatable(config[CONF_COMMAND], args, SomfyCommand)
-    mode = await cg.templatable(config[CONF_MODE], args, SomfyMode)
-    repeat = await cg.templatable(config[CONF_REPEAT], args, cg.uint32)
+    command = await cg.templatable(config.get(CONF_COMMAND, "POWER"), args, SomfyCommand)
+    mode = await cg.templatable(config.get(CONF_MODE, "POOLSPA"), args, SomfyMode)
+    repeat = await cg.templatable(config.get(CONF_REPEAT, 0), args, cg.uint32)
     cg.add(var.set_command(command))
     cg.add(var.set_mode(mode))
     cg.add(var.set_repeat(repeat))
