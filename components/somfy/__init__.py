@@ -11,6 +11,7 @@ MULTI_CONF = True
 CONF_TRANSMITTER_ID = "transmitter_id"
 CONF_RECEIVER_ID = "receiver_id"
 CONF_COMMAND = "command"
+CONF_MODE = "mode"
 CONF_REPEAT = "repeat"
 CONF_CODE = "code"
 
@@ -50,6 +51,14 @@ SOMFY_COMMAND = {
     "SENSOR": SomfyCommand.SOMFY_SENSOR,
 }
 
+SomfyMode = somfy_ns.enum("SomfyMode")
+SOMFY_MODE = {
+    "POOL": SomfyMode.SOMFY_POOL,
+    "SPA": SomfyMode.SOMFY_SPA,
+    "POOLSPA": SomfyMode.SOMFY_MODE,
+}
+
+
 CONFIG_SCHEMA = cv.Schema(
     {
         cv.GenerateID(): cv.declare_id(SomfyComponent),
@@ -80,7 +89,8 @@ async def to_code(config):
         {
             cv.Required(CONF_ID): cv.use_id(SomfyComponent),
             cv.Required(CONF_COMMAND): cv.templatable(cv.enum(SOMFY_COMMAND, upper=True)),
-            cv.Required(CONF_REPEAT): cv.templatable(cv.int_range(min=0, max=5)),
+            cv.Required(CONF_MODE): cv.templatable(cv.enum(SOMFY_MODE, upper=True)),
+            cv.Optional(CONF_REPEAT): cv.templatable(cv.int_range(min=0, max=5)),
         }
     ),
 )
@@ -88,8 +98,10 @@ async def somfy_send_command_to_code(config, action_id, template_arg, args):
     paren = await cg.get_variable(config[CONF_ID])
     var = cg.new_Pvariable(action_id, template_arg, paren)
     command = await cg.templatable(config[CONF_COMMAND], args, SomfyCommand)
+    mode = await cg.templatable(config[CONF_MODE], args, SomfyMode)
     repeat = await cg.templatable(config[CONF_REPEAT], args, cg.uint32)
     cg.add(var.set_command(command))
+    cg.add(var.set_mode(mode))
     cg.add(var.set_repeat(repeat))
     return var
 
