@@ -8,6 +8,7 @@ from esphome.const import CONF_ID, CONF_ADDRESS
 CODEOWNERS = ["@swoboda1337"]
 DEPENDENCIES = ["remote_transmitter", "remote_receiver"]
 MULTI_CONF = True
+
 CONF_TRANSMITTER_ID = "transmitter_id"
 CONF_RECEIVER_ID = "receiver_id"
 CONF_COMMAND = "command"
@@ -35,7 +36,7 @@ SOMFY_COMMAND = {
     "MODE3": SomfyCommand.SOMFY_MODE3,
     "MODE4": SomfyCommand.SOMFY_MODE4,
     "BRIGHTNESS": SomfyCommand.SOMFY_BRIGHTNESS,
-    
+
     "MY": SomfyCommand.SOMFY_MY,
     "UP": SomfyCommand.SOMFY_UP,
     "MYUP": SomfyCommand.SOMFY_MYUP,
@@ -67,7 +68,7 @@ CONFIG_SCHEMA = cv.Schema(
         cv.GenerateID(CONF_RECEIVER_ID): cv.use_id(
             remote_receiver.RemoteReceiverComponent
         ),
-        cv.Required(CONF_ADDRESS): cv.hex_uint32_t,
+        cv.Optional(CONF_ADDRESS, default=0xF9CB): cv.hex_uint32_t,
     }
 )
 
@@ -78,7 +79,10 @@ async def to_code(config):
     receiver = await cg.get_variable(config[CONF_RECEIVER_ID])
     cg.add(var.set_tx(transmitter))
     cg.add(var.set_rx(receiver))
-    cg.add(var.set_address(config[CONF_ADDRESS]))
+
+    address = config.get(CONF_ADDRESS, 0xF9CB)
+    cg.add(var.set_address(address))
+
 
 @automation.register_action(
     "somfy.send_command",
@@ -95,9 +99,9 @@ async def to_code(config):
 async def somfy_send_command_to_code(config, action_id, template_arg, args):
     paren = await cg.get_variable(config[CONF_ID])
     var = cg.new_Pvariable(action_id, template_arg, paren)
-    command = await cg.templatable(config.get(CONF_COMMAND, "POWER"), args, SomfyCommand)
-    mode = await cg.templatable(config.get(CONF_MODE, "POOLSPA"), args, SomfyMode)
-    repeat = await cg.templatable(config.get(CONF_REPEAT, 0), args, cg.uint32)
+    command = await cg.templatable(config[CONF_COMMAND], args, SomfyCommand)
+    mode = await cg.templatable(config[CONF_MODE], args, SomfyMode)
+    repeat = await cg.templatable(config.get(CONF_REPEAT, 4), args, cg.uint32)
     cg.add(var.set_command(command))
     cg.add(var.set_mode(mode))
     cg.add(var.set_repeat(repeat))
