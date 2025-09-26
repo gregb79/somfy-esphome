@@ -28,7 +28,7 @@ void SomfyComponent::set_code(uint16_t code) {
   this->preferences_.save(&this->code_);
 }
 
-void SomfyComponent::send_command(SomfyCommand command, uint32_t repeat) {
+void SomfyComponent::send_command(SomfyCommand command, SomfyMode mode, uint32_t repeat) {
   uint8_t frame[8];
   frame[0] = 0x2D;     // PRE
   frame[1] = 0xD4;     // PRE
@@ -39,7 +39,8 @@ void SomfyComponent::send_command(SomfyCommand command, uint32_t repeat) {
   frame[4] = 0x00;     // Blank Space
   //frame[5] = 0x11;     // Instruction
   frame[5] = command;           // which button did  you press? The 4 LSB will be the checksum
-  frame[6] = 0x03;     // Mode
+  //frame[6] = 0x03;     // Mode
+  frame[6] = mode;     // Mode
   frame[7] = 0x27;     // checksum calculated from bits 0 - 6 , CheckSum8 2s Complement 0x100 - Sum Of Bytes (LAST 9 BITS)
 
   // frame[0] = 0xA7;                   // encryption key. Doesn't matter much
@@ -52,7 +53,7 @@ void SomfyComponent::send_command(SomfyCommand command, uint32_t repeat) {
 
   
   //ESP_LOGD(TAG, "Somfy sending 0x%" PRIX8 " repeated %" PRIu32 " times", command, repeat);
-  ESP_LOGD(TAG, "Somfy sending command: 0x%" PRIX8 ", address: 0x%" PRIX32 ", repeated %" PRIu32 " times", command, this->address_, repeat + 1);
+  ESP_LOGD(TAG, "Somfy sending command: 0x%" PRIX16 ",mode: 0x%" PRIX16 ", address: 0x%" PRIX32 ", repeated %" PRIu32 " times", command, mode, this->address_, repeat + 1);
 
   
   // Optional: original Somfy protocol — disabled for test mode
