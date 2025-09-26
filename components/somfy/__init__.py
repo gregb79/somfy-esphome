@@ -34,6 +34,18 @@ SOMFY_COMMAND = {
     "MODE3": SomfyCommand.SOMFY_MODE3,
     "MODE4": SomfyCommand.SOMFY_MODE4,
     "BRIGHTNESS": SomfyCommand.SOMFY_BRIGHTNESS,
+    "MY": SomfyCommand.SOMFY_MY,
+    "UP": SomfyCommand.SOMFY_UP,
+    "MYUP": SomfyCommand.SOMFY_MYUP,
+    "DOWN": SomfyCommand.SOMFY_DOWN,
+    "MYDOWN": SomfyCommand.SOMFY_MYDOWN,
+    "UPDOWN": SomfyCommand.SOMFY_UPDOWN,
+    "MYUPDOWN": SomfyCommand.SOMFY_MYUPDOWN,
+    "PROG": SomfyCommand.SOMFY_PROG,
+    "SUNFLAG": SomfyCommand.SOMFY_SUNFLAG,
+    "FLAG": SomfyCommand.SOMFY_FLAG,
+    "STEPDOWN": SomfyCommand.SOMFY_STEPDOWN,
+    "TOGGLE": SomfyCommand.SOMFY_TOGGLE,
     "SENSOR": SomfyCommand.SOMFY_SENSOR,
 }
 
