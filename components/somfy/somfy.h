@@ -8,19 +8,19 @@ namespace esphome {
 namespace somfy {
 
 enum SomfyCommand : uint8_t {
-    SOMFY_MY = 0x1,
-    SOMFY_UP = 0x2,
-    SOMFY_MYUP = 0x3,
-    SOMFY_DOWN = 0x4,
-    SOMFY_MYDOWN = 0x5,
-    SOMFY_UPDOWN = 0x6,
-    SOMFY_MYUPDOWN = 0x7,
-    SOMFY_PROG = 0x8,
-    SOMFY_SUNFLAG = 0x9,
-    SOMFY_FLAG = 0xA,
-    SOMFY_STEPDOWN = 0xB,
-    SOMFY_TOGGLE = 0xC,
-    SOMFY_SENSOR = 0xE,
+    SOMFY_POWER = 0x11,
+    SOMFY_BLUE = 0x21,
+    SOMFY_MAGENTA = 0x22,
+    SOMFY_RED = 0x23,
+    SOMFY_LIME = 0x24,
+    SOMFY_GREEN = 0x25,
+    SOMFY_AQUA = 0x26,
+    SOMFY_WHITE = 0x27,
+    SOMFY_MODE1 = 0x31,
+    SOMFY_MODE2 = 0x32,
+    SOMFY_MODE3 = 0x33,
+    SOMFY_MODE4 = 0x34,
+    SOMFY_BRIGHTNESS = 0x41,
 };
 
 class SomfySensor {
