@@ -37,8 +37,8 @@ void SomfyComponent::send_command(SomfyCommand command, uint32_t repeat) {
   // frame[3] = 0xCB;     // ID2
   frame[3] = this->address_;         // remote address  
   frame[4] = 0x00;     // Blank Space
-  //frame[5] = 0x11;     // Command Instruction
-  frame[5] = this->command;     // Command Instruction
+  frame[5] = 0x11;     // Command Instruction
+  //frame[5] = this->command;     // Command Instruction
   frame[6] = 0x03;     // Mode
   frame[7] = 0x27;     // checksum calculated from bits 0 - 6 , CheckSum8 2s Complement 0x100 - Sum Of Bytes (LAST 9 BITS)
 
