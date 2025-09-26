@@ -32,9 +32,9 @@ void SomfyComponent::send_command(SomfyCommand command, uint32_t repeat) {
   uint8_t frame[8];
   frame[0] = 0x2D;     // PRE
   frame[1] = 0xD4;     // PRE
-  //frame[2] = 0xF9;     // ID1
+  frame[2] = 0xF9;     // ID1
   
-  //frame[3] = 0xCB;     // ID2
+  frame[3] = 0xCB;     // ID2
   
   frame[4] = 0x00;     // Blank Space
   frame[5] = 0x11;     // Instruction
