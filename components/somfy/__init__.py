@@ -34,6 +34,7 @@ SOMFY_COMMAND = {
     "MODE3": SomfyCommand.SOMFY_MODE3,
     "MODE4": SomfyCommand.SOMFY_MODE4,
     "BRIGHTNESS": SomfyCommand.SOMFY_BRIGHTNESS,
+    
     "MY": SomfyCommand.SOMFY_MY,
     "UP": SomfyCommand.SOMFY_UP,
     "MYUP": SomfyCommand.SOMFY_MYUP,
