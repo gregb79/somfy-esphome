@@ -55,7 +55,7 @@ SomfyMode = somfy_ns.enum("SomfyMode")
 SOMFY_MODE = {
     "POOL": SomfyMode.SOMFY_POOL,
     "SPA": SomfyMode.SOMFY_SPA,
-    "POOLSPA": SomfyMode.SOMFY_MODE,
+    "POOLSPA": SomfyMode.SOMFY_POOLSPA,
 }
 
 
