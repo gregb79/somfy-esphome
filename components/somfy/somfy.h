@@ -7,7 +7,7 @@
 namespace esphome {
 namespace somfy {
 
-enum SomfyCommand : uint8_t {
+enum SomfyCommand : uint16_t {
     SOMFY_POWER = 0x11,
     SOMFY_BLUE = 0x21,
     SOMFY_MAGENTA = 0x22,
