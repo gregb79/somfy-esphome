@@ -24,10 +24,11 @@ template<typename... Ts> class SomfySendCommandAction : public Action<Ts...> {
  public:
   SomfySendCommandAction(SomfyComponent *somfy) : somfy_(somfy) {}
   TEMPLATABLE_VALUE(SomfyCommand, command)
+  TEMPLATABLE_VALUE(SomfyMode, mode)
   TEMPLATABLE_VALUE(uint32_t, repeat)
 
   void play(Ts... x) override {
-    this->somfy_->send_command(this->command_.value(x...), this->repeat_.value(x...));
+    this->somfy_->send_command(this->command_.value(x...), this->mode_.value(x...), this->repeat_.value(x...));
   }
 
  protected:
