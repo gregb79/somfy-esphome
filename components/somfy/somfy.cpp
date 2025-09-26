@@ -29,68 +29,104 @@ void SomfyComponent::set_code(uint16_t code) {
 }
 
 void SomfyComponent::send_command(SomfyCommand command, uint32_t repeat) {
-  uint8_t frame[7];
-  frame[0] = 0xA7;                   // encryption key. Doesn't matter much
-  frame[1] = command << 4;           // which button did  you press? The 4 LSB will be the checksum
-  frame[2] = this->code_ >> 8;       // rolling code (big endian)
-  frame[3] = this->code_;            // rolling code
-  frame[4] = this->address_ >> 16;   // remote address
-  frame[5] = this->address_ >> 8;    // remote address
-  frame[6] = this->address_;         // remote address
+  uint8_t frame[8];
+  frame[0] = 0x2D;     // PRE
+  frame[1] = 0xD4;     // PRE
+  frame[2] = 0xF9;     // ID1
+  frame[3] = 0xCB;     // ID2
+  frame[4] = 0x00;     // Blank Space
+  frame[5] = 0x11;     // Instruction
+  frame[6] = 0x03;     // Mode
+  frame[7] = 0x27;     // checksum calculated from bits 0 - 6 , CheckSum8 2s Complement 0x100 - Sum Of Bytes ( LAST 9 BITS)
+    
 
   ESP_LOGD(TAG, "Somfy sending 0x%" PRIX8 " repeated %" PRIu32 " times", command, repeat);
 
-  // crc
-  uint8_t crc = 0;
-  for (uint8_t i = 0; i < 7; i++) {
-    crc ^= frame[i];
-    crc ^= frame[i] >> 4;
-  }
-  frame[1] |= crc & 0xF;
+  // // crc
+  //uint8_t crc = 0;
+  //for (uint8_t i = 0; i < 7; i++) {
+  //  crc ^= frame[i];
+  //  crc ^= frame[i] >> 4;
+  //}
+  // frame[1] |= crc & 0xF;
 
-  // obfuscation
-  for (uint8_t i = 1; i < 7; i++) {
-    frame[i] ^= frame[i - 1];
-  }
+  // // obfuscation
+  //for (uint8_t i = 1; i < 7; i++) {
+  //  frame[i] ^= frame[i - 1];
+  //}
 
   // update code
-  this->code_ += 1;
-  this->preferences_.save(&this->code_);
+  //this->code_ += 1;
+  //this->preferences_.save(&this->code_);
 
   // send frame
   auto call = this->tx_->transmit();
   remote_base::RemoteTransmitData *dst = call.get_data();
-  dst->item(9415, 9565);
-  dst->space(80000);
+  //dst->item(9415, 9565);
+  //dst->space(80000);
+
+
+ repeat = 5
+  
   for (uint32_t i = 0; i < (repeat + 1); i++) {
     // hardware sync, two sync for the first frame, seven for the following ones
-    uint32_t syncs = (i == 0) ? 2 : 7;
-    for (uint32_t j = 0; j < syncs; j++) {
-      dst->item(SYMBOL * 4, SYMBOL * 4);
+    
+    //uint32_t syncs = (i == 0) ? 2 : 7;
+    //for (uint32_t j = 0; j < syncs; j++) {
+    //  dst->item(SYMBOL * 4, SYMBOL * 4);
+    //}
+
+    const uint8_t sync_bytes[] = {0xAA, 0xAA, 0xAA, 0xAA};
+
+    for (uint32_t i = 0; i < (repeat + 1); i++) {
+      // Hardware sync: send 4 bytes of 0xAA each (8 bits)
+      for (uint8_t sync_byte : sync_bytes) {
+        uint8_t byte = sync_byte;
+        for (int bit = 0; bit < 8; bit++) {
+          if (byte & 0x80) {
+            dst->mark(105);  // bit = 1 → mark 105 µs
+          } else {
+            dst->space(104); // bit = 0 → space 104 µs
+          }
+          byte <<= 1;
+        }
+      }
     }
 
-    // software sync
-    dst->item(4550, SYMBOL);
+   // // software sync
+    // dst->item(4550, SYMBOL);
 
-    // data
+    // // data
+    //for (uint8_t byte : frame) {
+     // for (uint32_t j = 0; j < 8; j++) {
+     //   if ((byte & 0x80) != 0) {
+     //     dst->space(SYMBOL);
+     //     dst->mark(SYMBOL);
+     //   } else {
+      //    dst->mark(SYMBOL);
+     //     dst->space(SYMBOL);
+     //   }
+    //    byte <<= 1;
+    //  }
+    //}
+
+    // Send bits: 1 = mark(105), 0 = space(104)
     for (uint8_t byte : frame) {
-      for (uint32_t j = 0; j < 8; j++) {
+      for (uint8_t j = 0; j < 8; j++) {
         if ((byte & 0x80) != 0) {
-          dst->space(SYMBOL);
-          dst->mark(SYMBOL);
+          dst->mark(105);   // 1 → HIGH 105 µs
         } else {
-          dst->mark(SYMBOL);
-          dst->space(SYMBOL);
+          dst->space(104);  // 0 → LOW 104 µs
         }
         byte <<= 1;
       }
     }
-
-    // inter frame silence
-    dst->space(415);
-    if (i < repeat) {
-      dst->space(30000);
-    }
+   
+    // // inter frame silence
+    //dst->space(415);
+    //if (i < repeat) {
+    //  dst->space(30000);
+    //}
   }
   call.perform();
 }
