@@ -32,12 +32,13 @@ void SomfyComponent::send_command(SomfyCommand command, uint32_t repeat) {
   uint8_t frame[8];
   frame[0] = 0x2D;     // PRE
   frame[1] = 0xD4;     // PRE
-  frame[2] = 0xF9;     // ID1
-  
-  frame[3] = 0xCB;     // ID2
-  
+  //frame[2] = 0xF9;     // ID1
+  frame[2] = this->address_ >> 8;    // remote address  
+  //frame[3] = 0xCB;     // ID2
+  frame[3] = this->address_;         // remote address
   frame[4] = 0x00;     // Blank Space
-  frame[5] = 0x11;     // Instruction
+  //frame[5] = 0x11;     // Instruction
+  frame[5] = command;           // which button did  you press? The 4 LSB will be the checksum
   frame[6] = 0x03;     // Mode
   frame[7] = 0x27;     // checksum calculated from bits 0 - 6 , CheckSum8 2s Complement 0x100 - Sum Of Bytes (LAST 9 BITS)
 
