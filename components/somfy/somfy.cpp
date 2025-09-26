@@ -95,8 +95,8 @@ void SomfyComponent::send_command(SomfyCommand command, uint32_t repeat) {
       }
     }
 
-    // Optional: inter-frame silence
-    dst->space(10000);  // 10 ms gap before next repeat
+    // // Optional: inter-frame silence
+    //dst->space(10000);  // 10 ms gap before next repeat
   }
 
   // Send the pulse train
