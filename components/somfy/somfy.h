@@ -8,7 +8,7 @@ namespace esphome {
 namespace somfy {
 
 enum SomfyCommand : uint16_t {
-    SOMFY_MY = 0x11,
+    SOMFY_POWER = 0x11,
     SOMFY_UP = 0x21,
     SOMFY_MYUP = 0x22,
     SOMFY_DOWN = 0x23,
