@@ -21,19 +21,19 @@ SomfySetCodeAction = somfy_ns.class_("SomfySetCodeAction", automation.Action)
 
 SomfyCommand = somfy_ns.enum("SomfyCommand")
 SOMFY_COMMAND = {
-    "MY": SomfyCommand.SOMFY_MY,
-    "UP": SomfyCommand.SOMFY_UP,
-    "MYUP": SomfyCommand.SOMFY_MYUP,
-    "DOWN": SomfyCommand.SOMFY_DOWN,
-    "MYDOWN": SomfyCommand.SOMFY_MYDOWN,
-    "UPDOWN": SomfyCommand.SOMFY_UPDOWN,
-    "MYUPDOWN": SomfyCommand.SOMFY_MYUPDOWN,
-    "PROG": SomfyCommand.SOMFY_PROG,
-    "SUNFLAG": SomfyCommand.SOMFY_SUNFLAG,
-    "FLAG": SomfyCommand.SOMFY_FLAG,
-    "STEPDOWN": SomfyCommand.SOMFY_STEPDOWN,
-    "TOGGLE": SomfyCommand.SOMFY_TOGGLE,
-    "SENSOR": SomfyCommand.SOMFY_SENSOR,
+    "POWER": SomfyCommand.SOMFY_POWER,
+    "BLUE": SomfyCommand.SOMFY_BLUE,
+    "MAGENTA": SomfyCommand.SOMFY_MAGENTA,
+    "RED": SomfyCommand.SOMFY_RED,
+    "LIME": SomfyCommand.SOMFY_LIME,
+    "GREEN": SomfyCommand.SOMFY_GREEN,
+    "AQUA": SomfyCommand.SOMFY_AQUA,
+    "WHITE": SomfyCommand.SOMFY_WHITE,
+    "MODE1": SomfyCommand.SOMFY_MODE1,
+    "MODE2": SomfyCommand.SOMFY_MODE2,
+    "MODE3": SomfyCommand.SOMFY_MODE3,
+    "MODE4": SomfyCommand.SOMFY_MODE4,
+    "BRIGHTNESS": SomfyCommand.SOMFY_BRIGHTNESS,
 }
 
 CONFIG_SCHEMA = cv.Schema(
