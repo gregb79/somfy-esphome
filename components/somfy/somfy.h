@@ -37,6 +37,12 @@ enum SomfyCommand : uint16_t {
     SOMFY_SENSOR = 0xE,
 };
 
+enum SomfyMode : uint16_t {
+    SOMFY_POOL = 0x01,
+    SOMFY_SPA = 0x02,
+    SOMFY_POOLSPA = 0x03,
+};
+
 class SomfySensor {
  public:
   virtual void update_sunny(uint32_t address, bool value) {}
@@ -49,7 +55,7 @@ class SomfyComponent : public Component, public remote_base::RemoteReceiverListe
   void setup() override;
   void dump_config() override;
   bool on_receive(remote_base::RemoteReceiveData data) override;
-  void send_command(SomfyCommand command, uint32_t repeat = 4);
+  void send_command(SomfyCommand command, SomfyMode mode, uint32_t repeat = 4);
   void set_code(uint16_t code);
   void set_tx(remote_transmitter::RemoteTransmitterComponent *tx) { this->tx_ = tx; }
   void set_rx(remote_receiver::RemoteReceiverComponent *rx) { this->rx_ = rx; }
