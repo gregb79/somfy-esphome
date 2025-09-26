@@ -65,6 +65,8 @@ void SomfyComponent::send_command(SomfyCommand command, uint32_t repeat) {
   auto call = this->tx_->transmit();
   remote_base::RemoteTransmitData *dst = call.get_data();
 
+  repeat = 5;
+  
   for (uint32_t i = 0; i < (repeat + 1); i++) {
     // Hardware sync: send 4 bytes of 0xAA (10101010)
     const uint8_t sync_bytes[] = {0xAA, 0xAA, 0xAA, 0xAA};
