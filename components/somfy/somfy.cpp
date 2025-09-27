@@ -41,7 +41,7 @@ void SomfyComponent::send_command(SomfyCommand command, SomfyMode mode, uint32_t
   frame[5] = command;           // which button did  you press? The 4 LSB will be the checksum
   //frame[6] = 0x03;     // Mode
   frame[6] = mode;     // Mode
-  frame[7] = 0x27;     // checksum calculated from bits 0 - 6 , CheckSum8 2s Complement 0x100 - Sum Of Bytes (LAST 9 BITS)
+  frame[7] = 0x00;     // checksum calculated from bits 0 - 6 , CheckSum8 2s Complement 0x100 - Sum Of Bytes (LAST 9 BITS)
 
   // Calculate 8-bit 2's complement checksum from bytes 0–6
   uint16_t sum = 0;
