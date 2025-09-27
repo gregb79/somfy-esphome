@@ -3,20 +3,20 @@ from esphome.components import binary_sensor
 import esphome.config_validation as cv
 from esphome.const import CONF_ADDRESS, CONF_ID, DEVICE_CLASS_LIGHT, DEVICE_CLASS_MOVING
 
-from .. import SomfyComponent, somfy_ns
+from .. import IrisComponent, iris_ns
 
-DEPENDENCIES = ["somfy"]
+DEPENDENCIES = ["iris"]
 
-CONF_SOMFY_ID = "somfy_id"
+CONF_IRIS_ID = "iris_id"
 CONF_SUNNY = "sunny"
 CONF_WINDY = "windy"
 
-SomfyBinarySensor = somfy_ns.class_("SomfyBinarySensor", cg.Component)
+IrisBinarySensor = iris_ns.class_("IrisBinarySensor", cg.Component)
 
 CONFIG_SCHEMA = cv.Schema(
     {
-        cv.GenerateID(): cv.declare_id(SomfyBinarySensor),
-        cv.GenerateID(CONF_SOMFY_ID): cv.use_id(SomfyComponent),
+        cv.GenerateID(): cv.declare_id(IrisBinarySensor),
+        cv.GenerateID(CONF_IRIS_ID): cv.use_id(IrisComponent),
         cv.Required(CONF_ADDRESS): cv.hex_uint32_t,
         cv.Optional(CONF_SUNNY): binary_sensor.binary_sensor_schema(
             device_class=DEVICE_CLASS_LIGHT,
@@ -28,7 +28,7 @@ CONFIG_SCHEMA = cv.Schema(
 )
 
 async def to_code(config):
-    parent = await cg.get_variable(config[CONF_SOMFY_ID])
+    parent = await cg.get_variable(config[CONF_IRIS_ID])
     var = cg.new_Pvariable(config[CONF_ID])
     await cg.register_component(var, config)
     cg.add(var.set_address(config[CONF_ADDRESS]))
