@@ -2,12 +2,12 @@
 #pragma once
 
 #include "esphome/components/binary_sensor/binary_sensor.h"
-#include "esphome/components/somfy/somfy.h"
+#include "esphome/components/iris/iris.h"
 
 namespace esphome {
-namespace somfy {
+namespace iris {
 
-class SomfyBinarySensor : public Component, public SomfySensor {
+class IrisBinarySensor : public Component, public IrisSensor {
  public:
   virtual void update_sunny(uint32_t address, bool value) override;
   virtual void update_windy(uint32_t address, bool value) override;
@@ -19,5 +19,5 @@ class SomfyBinarySensor : public Component, public SomfySensor {
   uint32_t address_;
 };
 
-}  // namespace somfy
+}  // namespace iris
 }  // namespace esphome
