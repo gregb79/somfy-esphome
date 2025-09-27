@@ -16,52 +16,52 @@ CONF_MODE = "mode"
 CONF_REPEAT = "repeat"
 CONF_CODE = "code"
 
-somfy_ns = cg.esphome_ns.namespace("somfy")
-SomfyComponent = somfy_ns.class_("SomfyComponent", cg.Component)
-SomfySendCommandAction = somfy_ns.class_("SomfySendCommandAction", automation.Action)
-SomfySetCodeAction = somfy_ns.class_("SomfySetCodeAction", automation.Action)
+iris_ns = cg.esphome_ns.namespace("iris")
+IrisComponent = iris_ns.class_("IrisComponent", cg.Component)
+IrisSendCommandAction = iris_ns.class_("IrisSendCommandAction", automation.Action)
+IrisSetCodeAction = iris_ns.class_("IrisSetCodeAction", automation.Action)
 
-SomfyCommand = somfy_ns.enum("SomfyCommand")
-SOMFY_COMMAND = {
-    "POWER": SomfyCommand.SOMFY_POWER,
-    "BLUE": SomfyCommand.SOMFY_BLUE,
-    "MAGENTA": SomfyCommand.SOMFY_MAGENTA,
-    "RED": SomfyCommand.SOMFY_RED,
-    "LIME": SomfyCommand.SOMFY_LIME,
-    "GREEN": SomfyCommand.SOMFY_GREEN,
-    "AQUA": SomfyCommand.SOMFY_AQUA,
-    "WHITE": SomfyCommand.SOMFY_WHITE,
-    "MODE1": SomfyCommand.SOMFY_MODE1,
-    "MODE2": SomfyCommand.SOMFY_MODE2,
-    "MODE3": SomfyCommand.SOMFY_MODE3,
-    "MODE4": SomfyCommand.SOMFY_MODE4,
-    "BRIGHTNESS": SomfyCommand.SOMFY_BRIGHTNESS,
+IrisCommand = iris_ns.enum("IrisCommand")
+IRIS_COMMAND = {
+    "POWER": IrisCommand.IRIS_POWER,
+    "BLUE": IrisCommand.IRIS_BLUE,
+    "MAGENTA": IrisCommand.IRIS_MAGENTA,
+    "RED": IrisCommand.IRIS_RED,
+    "LIME": IrisCommand.IRIS_LIME,
+    "GREEN": IrisCommand.IRIS_GREEN,
+    "AQUA": IrisCommand.IRIS_AQUA,
+    "WHITE": IrisCommand.IRIS_WHITE,
+    "MODE1": IrisCommand.IRIS_MODE1,
+    "MODE2": IrisCommand.IRIS_MODE2,
+    "MODE3": IrisCommand.IRIS_MODE3,
+    "MODE4": IrisCommand.IRIS_MODE4,
+    "BRIGHTNESS": IrisCommand.IRIS_BRIGHTNESS,
 
-    "MY": SomfyCommand.SOMFY_MY,
-    "UP": SomfyCommand.SOMFY_UP,
-    "MYUP": SomfyCommand.SOMFY_MYUP,
-    "DOWN": SomfyCommand.SOMFY_DOWN,
-    "MYDOWN": SomfyCommand.SOMFY_MYDOWN,
-    "UPDOWN": SomfyCommand.SOMFY_UPDOWN,
-    "MYUPDOWN": SomfyCommand.SOMFY_MYUPDOWN,
-    "PROG": SomfyCommand.SOMFY_PROG,
-    "SUNFLAG": SomfyCommand.SOMFY_SUNFLAG,
-    "FLAG": SomfyCommand.SOMFY_FLAG,
-    "STEPDOWN": SomfyCommand.SOMFY_STEPDOWN,
-    "TOGGLE": SomfyCommand.SOMFY_TOGGLE,
-    "SENSOR": SomfyCommand.SOMFY_SENSOR,
+    "MY": IrisCommand.IRIS_MY,
+    "UP": IrisCommand.IRIS_UP,
+    "MYUP": IrisCommand.IRIS_MYUP,
+    "DOWN": IrisCommand.IRIS_DOWN,
+    "MYDOWN": IrisCommand.IRIS_MYDOWN,
+    "UPDOWN": IrisCommand.IRIS_UPDOWN,
+    "MYUPDOWN": IrisCommand.IRIS_MYUPDOWN,
+    "PROG": IrisCommand.IRIS_PROG,
+    "SUNFLAG": IrisCommand.IRIS_SUNFLAG,
+    "FLAG": IrisCommand.IRIS_FLAG,
+    "STEPDOWN": IrisCommand.IRIS_STEPDOWN,
+    "TOGGLE": IrisCommand.IRIS_TOGGLE,
+    "SENSOR": IrisCommand.IRIS_SENSOR,
 }
 
-SomfyMode = somfy_ns.enum("SomfyMode")
-SOMFY_MODE = {
-    "POOL": SomfyMode.SOMFY_POOL,
-    "SPA": SomfyMode.SOMFY_SPA,
-    "POOLSPA": SomfyMode.SOMFY_POOLSPA,
+IrisMode = iris_ns.enum("IrisMode")
+IRIS_MODE = {
+    "POOL": IrisMode.IRIS_POOL,
+    "SPA": IrisMode.IRIS_SPA,
+    "POOLSPA": IrisMode.IRIS_POOLSPA,
 }
 
 CONFIG_SCHEMA = cv.Schema(
     {
-        cv.GenerateID(): cv.declare_id(SomfyComponent),
+        cv.GenerateID(): cv.declare_id(IrisComponent),
         cv.GenerateID(CONF_TRANSMITTER_ID): cv.use_id(
             remote_transmitter.RemoteTransmitterComponent
         ),
@@ -85,22 +85,22 @@ async def to_code(config):
 
 
 @automation.register_action(
-    "somfy.send_command",
-    SomfySendCommandAction,
+    "iris.send_command",
+    IrisSendCommandAction,
     cv.Schema(
         {
-            cv.Required(CONF_ID): cv.use_id(SomfyComponent),
-            cv.Optional(CONF_COMMAND, default="POWER"): cv.templatable(cv.enum(SOMFY_COMMAND, upper=True)),
-            cv.Optional(CONF_MODE, default="POOLSPA"): cv.templatable(cv.enum(SOMFY_MODE, upper=True)),
+            cv.Required(CONF_ID): cv.use_id(IrisComponent),
+            cv.Optional(CONF_COMMAND, default="POWER"): cv.templatable(cv.enum(IRIS_COMMAND, upper=True)),
+            cv.Optional(CONF_MODE, default="POOLSPA"): cv.templatable(cv.enum(IRIS_MODE, upper=True)),
             cv.Optional(CONF_REPEAT): cv.templatable(cv.int_range(min=0, max=6)),
         }
     ),
 )
-async def somfy_send_command_to_code(config, action_id, template_arg, args):
+async def iris_send_command_to_code(config, action_id, template_arg, args):
     paren = await cg.get_variable(config[CONF_ID])
     var = cg.new_Pvariable(action_id, template_arg, paren)
-    command = await cg.templatable(config[CONF_COMMAND], args, SomfyCommand)
-    mode = await cg.templatable(config[CONF_MODE], args, SomfyMode)
+    command = await cg.templatable(config[CONF_COMMAND], args, IrisCommand)
+    mode = await cg.templatable(config[CONF_MODE], args, IrisMode)
     repeat = await cg.templatable(config.get(CONF_REPEAT, 4), args, cg.uint32)
     cg.add(var.set_command(command))
     cg.add(var.set_mode(mode))
@@ -108,16 +108,16 @@ async def somfy_send_command_to_code(config, action_id, template_arg, args):
     return var
 
 @automation.register_action(
-    "somfy.set_code",
-    SomfySetCodeAction,
+    "iris.set_code",
+    IrisSetCodeAction,
     cv.Schema(
         {
-            cv.Required(CONF_ID): cv.use_id(SomfyComponent),
+            cv.Required(CONF_ID): cv.use_id(IrisComponent),
             cv.Required(CONF_CODE): cv.templatable(cv.uint16_t),
         }
     ),
 )
-async def somfy_set_code_to_code(config, action_id, template_arg, args):
+async def iris_set_code_to_code(config, action_id, template_arg, args):
     paren = await cg.get_variable(config[CONF_ID])
     var = cg.new_Pvariable(action_id, template_arg, paren)
     code = await cg.templatable(config[CONF_CODE], args, cg.uint16)
