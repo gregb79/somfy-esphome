@@ -1,34 +1,34 @@
 #include "esphome/core/log.h"
 #include "esphome/core/helpers.h"
 #include "esphome/core/hal.h"
-#include "somfy.h"
+#include "iris.h"
 
 namespace esphome {
-namespace somfy {
+namespace iris {
 
-static const char *const TAG = "somfy";
+static const char *const TAG = "iris";
 static const int32_t SYMBOL = 640;
 
-void SomfyComponent::dump_config() {
-  ESP_LOGCONFIG(TAG, "Somfy:");
+void IrisComponent::dump_config() {
+  ESP_LOGCONFIG(TAG, "Iris:");
   ESP_LOGCONFIG(TAG, "  Name: %" PRIx32, this->address_);
   ESP_LOGCONFIG(TAG, "  Code: %" PRIu16, this->code_);
 }
 
-void SomfyComponent::setup() {
-  uint32_t type = fnv1_hash(std::string("Somfy: ") + format_hex(this->address_));
+void IrisComponent::setup() {
+  uint32_t type = fnv1_hash(std::string("Iris: ") + format_hex(this->address_));
   this->preferences_ = global_preferences->make_preference<uint16_t>(type);
   this->preferences_.load(&this->code_);
   this->rx_->register_listener(this);
 }
 
-void SomfyComponent::set_code(uint16_t code) {
-  ESP_LOGD(TAG, "Somfy updating code to %" PRIu16 " from %" PRIu16, code, this->code_);
+void IrisComponent::set_code(uint16_t code) {
+  ESP_LOGD(TAG, "Iris updating code to %" PRIu16 " from %" PRIu16, code, this->code_);
   this->code_ = code;
   this->preferences_.save(&this->code_);
 }
 
-void SomfyComponent::send_command(SomfyCommand command, SomfyMode mode, uint32_t repeat) {
+void IrisComponent::send_command(IrisCommand command, IrisMode mode, uint32_t repeat) {
   uint8_t frame[8];
   frame[0] = 0x2D;     // PRE
   frame[1] = 0xD4;     // PRE
@@ -60,11 +60,11 @@ void SomfyComponent::send_command(SomfyCommand command, SomfyMode mode, uint32_t
   // frame[6] = this->address_;         // remote address
 
   
-  //ESP_LOGD(TAG, "Somfy sending 0x%" PRIX8 " repeated %" PRIu32 " times", command, repeat);
-  ESP_LOGD(TAG, "Somfy sending command: 0x%" PRIX16 ",mode: 0x%" PRIX16 ", address: 0x%" PRIX32 ", repeated %" PRIu32 " times", command, mode, this->address_, repeat + 1);
+  //ESP_LOGD(TAG, "Iris sending 0x%" PRIX8 " repeated %" PRIu32 " times", command, repeat);
+  ESP_LOGD(TAG, "Iris sending command: 0x%" PRIX16 ",mode: 0x%" PRIX16 ", address: 0x%" PRIX32 ", repeated %" PRIu32 " times", command, mode, this->address_, repeat + 1);
 
   
-  // Optional: original Somfy protocol — disabled for test mode
+  // Optional: original Iris protocol — disabled for test mode
   /*
   // crc
   uint8_t crc = 0;
@@ -128,7 +128,7 @@ void SomfyComponent::send_command(SomfyCommand command, SomfyMode mode, uint32_t
   call.perform();
 }
 
-bool SomfyComponent::on_receive(remote_base::RemoteReceiveData data) {
+bool IrisComponent::on_receive(remote_base::RemoteReceiveData data) {
   uint8_t sync_count = 0;
   while (data.is_valid()) {
     while (data.expect_item(SYMBOL * 4, SYMBOL * 4)) {
@@ -181,7 +181,7 @@ bool SomfyComponent::on_receive(remote_base::RemoteReceiveData data) {
     ESP_LOGD(TAG, "Received: command: %" PRIx8 ", code: %" PRIu16 ", address %" PRIx32,
              command, code, address);
 
-    if (command == SOMFY_SENSOR) {
+    if (command == IRIS_SENSOR) {
       for (auto *sensor : this->sensors_) {
         sensor->update_windy(address, (code & 1) != 0);
         sensor->update_sunny(address, (code & 2) != 0);
@@ -192,5 +192,5 @@ bool SomfyComponent::on_receive(remote_base::RemoteReceiveData data) {
   return true;
 }
 
-}  // namespace somfy
+}  // namespace iris
 }  // namespace esphome
